@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 
 namespace Interpreter
 {
@@ -9,7 +8,7 @@ namespace Interpreter
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            RunPrompt();
         }
 
         private static void RunFile(string path)
@@ -39,10 +38,15 @@ namespace Interpreter
 
         private static void Run(string source)
         {
+            var scanner = new Scanner(source);
+            var tokens = scanner.GenerateTokenList();
 
+            foreach (var token in tokens) { 
+                Console.WriteLine(token);
+            }
         }
 
-        private static void Error(int line, string message) { 
+        public static void Error(int line, string message) { 
             Report(line, "", message);  
         }
 
