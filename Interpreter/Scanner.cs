@@ -167,7 +167,7 @@
 
             var length = _current - _start;
 
-            var value = _source.Substring(_start + 1, length - 1);
+            var value = _source.Substring(_start + 1, length - 2);
             AddToken(TokenType.String, value);
         }
 
