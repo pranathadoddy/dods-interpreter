@@ -35,6 +35,11 @@ namespace Interpreter
         private object? _literal;
         private int _line;
 
+        public TokenType Type { get { return _type; } }
+        public string Lexeme { get { return _lexeme; } }
+        public object? Literal { get { return _literal; } }
+        public int Line { get { return _line; } }   
+
         public Token(TokenType type, string lexeme, object? literal, int line)
         {
             this._type = type;
