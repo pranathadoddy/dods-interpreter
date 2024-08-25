@@ -1,33 +1,39 @@
 ﻿namespace Interpreter
 {
-    internal class Interpret : Expression.IVisitor<object>
+    internal class Interpret : Expr.IVisitor<object>, Stmt.IVisitor<object>
     {
 
-        public void Parse(Expression expr)
+        public void Parse(List<Stmt> statements)
         {
             try
             {
-                object value = Evaluate(expr);
-                Console.WriteLine(value);
+                foreach (Stmt stmt in statements) { 
+                    Execute(stmt);
+                }
             }
             catch (RuntimeError error)
             {
-                
+                Program.RuntimeError(error);
             }
 
         }
 
-        object Expression.IVisitor<object>.VisitLiteralExpr(Expression.Literal expr)
+        private void Execute(Stmt stmt)
+        {
+            stmt.Accept(this);
+        }
+
+        object Expr.IVisitor<object>.VisitLiteralExpr(Expr.Literal expr)
         {
             return expr.Value;
         }
 
-        object Expression.IVisitor<object>.VisitGroupingExpr(Interpreter.Expression.Grouping expr)
+        object Expr.IVisitor<object>.VisitGroupingExpr(Interpreter.Expr.Grouping expr)
         {
             return Evaluate(expr.Expression);
         }
 
-        object Expression.IVisitor<object>.VisitUnaryExpr(Expression.Unary expr)
+        object Expr.IVisitor<object>.VisitUnaryExpr(Expr.Unary expr)
         {
             var right = Evaluate(expr.Right);
 
@@ -42,7 +48,7 @@
             return null;
         }
 
-        object Expression.IVisitor<object>.VisitBinaryExpr(Interpreter.Expression.Binary expr)
+        object Expr.IVisitor<object>.VisitBinaryExpr(Interpreter.Expr.Binary expr)
         {
             var right = Evaluate(expr.Right);
             var left = Evaluate(expr.Left);
@@ -108,7 +114,7 @@
         }
 
 
-        private object Evaluate(Expression expr)
+        private object Evaluate(Expr expr)
         {
             return expr.Accept(this);
         }
@@ -136,5 +142,17 @@
             return obj.ToString();
         }
 
+        object Stmt.IVisitor<object>.VisitExpressionStatement(Interpreter.Stmt.Expression stmt) 
+        {
+            Evaluate(stmt.Expr);
+            return null;
+        }
+
+        object Stmt.IVisitor<object>.VisitPrintStatement(Interpreter.Stmt.Print stmt)
+        {
+            var value = Evaluate(stmt.Expr);
+            Console.WriteLine(Stringify(value));
+            return null;
+        }
     }
 }

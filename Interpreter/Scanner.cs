@@ -24,7 +24,7 @@
                 { "if", TokenType.If },
                 { "nil", TokenType.Nil },
                 { "or", TokenType.Or },
-                { "print", TokenType.Print },
+                { "cetak", TokenType.Print },
                 { "return", TokenType.Return },
                 { "super", TokenType.Super },
                 { "this", TokenType.This },
@@ -229,7 +229,7 @@
             TokenType type = !_keywords.ContainsKey(text) ? TokenType.Identifier : _keywords[text];
             
 
-            AddToken(TokenType.Identifier);
+            AddToken(type);
         }
 
     }
