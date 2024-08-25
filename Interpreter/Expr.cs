@@ -1,10 +1,6 @@
-﻿using static Interpreter.Expression;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
-    internal abstract class Expression
+    internal abstract class Expr
     {
         internal interface IVisitor<R>
         {
@@ -17,18 +13,18 @@ namespace Interpreter
 
         internal abstract R Accept<R>(IVisitor<R> visitor);
 
-        public class Binary : Expression
+        public class Binary : Expr
         {
-            public Binary(Expression left, Token @operator, Expression right)
+            public Binary(Expr left, Token @operator, Expr right)
             {
                 Left = left;
                 Right = right;  
                 Operator = @operator;
             }
 
-            public  Expression Left;
+            public  Expr Left;
             public  Token Operator;
-            public  Expression Right;
+            public  Expr Right;
 
             internal override R Accept<R>(IVisitor<R> visitor)
             {
@@ -36,7 +32,7 @@ namespace Interpreter
             }
         }
 
-        public class Literal : Expression
+        public class Literal : Expr
         {
             public Literal(object value)
             {
@@ -51,9 +47,9 @@ namespace Interpreter
             public readonly object Value;
         }
 
-        public class Grouping : Expression
+        public class Grouping : Expr
         {
-            public Grouping(Expression expression)
+            public Grouping(Expr expression)
             {
                 Expression = expression;
             }
@@ -63,12 +59,12 @@ namespace Interpreter
                 return visitor.VisitGroupingExpr(this);
             }
 
-            public readonly Expression Expression;
+            public readonly Expr Expression;
         }
 
-        public class Unary : Expression
+        public class Unary : Expr
         {
-            public Unary(Token @operator, Expression right)
+            public Unary(Token @operator, Expr right)
             {
                 Operator = @operator;
                 Right = right;
@@ -80,7 +76,7 @@ namespace Interpreter
             }
 
             public readonly Token Operator;
-            public readonly Expression Right;
+            public readonly Expr Right;
         }
     }
 

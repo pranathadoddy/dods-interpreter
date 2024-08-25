@@ -2,16 +2,16 @@
 
 namespace Interpreter
 {
-    internal class AstPrinter : Expression.IVisitor<string>
+    internal class AstPrinter : Expr.IVisitor<string>
     {
         public AstPrinter() { }
 
-        public string Print(Expression expr)
+        public string Print(Expr expr)
         {
             return expr.Accept(this);
         }
 
-        private string Parenthesize(string name, params Expression[] exprs)
+        private string Parenthesize(string name, params Expr[] exprs)
         {
             var builder = new StringBuilder();
 
@@ -26,24 +26,24 @@ namespace Interpreter
             return builder.ToString();
         }
 
-        string Expression.IVisitor<string>.VisitBinaryExpr(Expression.Binary expr)
+        string Expr.IVisitor<string>.VisitBinaryExpr(Expr.Binary expr)
         {
             return Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
         }
 
-        string Expression.IVisitor<string>.VisitLiteralExpr(Interpreter.Expression.Literal expr)
+        string Expr.IVisitor<string>.VisitLiteralExpr(Interpreter.Expr.Literal expr)
         {
             if (expr.Value == null) return "nil";
 
             return expr.Value.ToString(); 
         }
 
-        string Expression.IVisitor<string>.VisitGroupingExpr(Interpreter.Expression.Grouping expr)
+        string Expr.IVisitor<string>.VisitGroupingExpr(Interpreter.Expr.Grouping expr)
         {
             return Parenthesize("group", expr.Expression);
         }
 
-        string Expression.IVisitor<string>.VisitUnaryExpr(Interpreter.Expression.Unary expr)
+        string Expr.IVisitor<string>.VisitUnaryExpr(Interpreter.Expr.Unary expr)
         {
             return Parenthesize(expr.Operator.Lexeme, expr.Right);
         }

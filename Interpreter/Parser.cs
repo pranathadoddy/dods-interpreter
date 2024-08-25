@@ -15,11 +15,17 @@
             this._tokens = tokens;
         }
 
-        public Expression Parse()
+        public List<Stmt> Parse()
         {
             try
             {
-                return Expression();
+                var statements = new List<Stmt>();
+
+                while (!IsAtEnd()) {
+                    statements.Add(Statement());
+                }
+
+                return statements;
             }
             catch (ParseError error)
             {
@@ -28,90 +34,108 @@
             }
         }
 
-        private Expression Expression() {
+        private Stmt Statement() { 
+            if(Match(TokenType.Print)) return PrintStatement();
+
+            return ExpressionStatement();
+        }
+
+        private Stmt PrintStatement() { 
+            Expr value = Expression();
+            Consume(TokenType.Semicolon, "Harap tambahkan titik koma (;) setelah ekspresi.");
+            return new Stmt.Print(value);
+        }
+
+        public Stmt ExpressionStatement() {
+            Expr value = Expression();
+            Consume(TokenType.Semicolon, "Harap tambahkan titik koma (;) setelah ekspresi.");
+            return new Stmt.Expression(value);
+        }
+
+        private Expr Expression() {
             return Equality();
         }
 
-        private Expression Equality()
+        private Expr Equality()
         {
-            Expression expr = Comparison();
+            Expr expr = Comparison();
 
             while (Match(TokenType.BangEqual, TokenType.EqualEqual))
             {
                 Token @operator = Previous();
-                Expression right = Comparison();
-                expr = new Expression.Binary(expr, @operator, right);
+                Expr right = Comparison();
+                expr = new Expr.Binary(expr, @operator, right);
             }
 
             return expr;
         }
 
-        private Expression Comparison()
+        private Expr Comparison()
         {
-            Expression expr = Term();
+            Expr expr = Term();
 
             while (Match(TokenType.Greater, TokenType.GreaterEqual, TokenType.Less, TokenType.LessEqual))
             {
                 Token @operator = Previous();
-                Expression right = Term();
-                expr = new Expression.Binary(expr, @operator, right);
+                Expr right = Term();
+                expr = new Expr.Binary(expr, @operator, right);
             }
 
             return expr;
         }
 
-        private Expression Term() {
-            Expression expr = Factor();
+        private Expr Term() {
+            Expr expr = Factor();
 
             while (Match(TokenType.Minus, TokenType.Plus))
             {
                 Token @operator = Previous();
-                Expression right = Factor();
-                expr = new Expression.Binary(expr, @operator, right);
+                Expr right = Factor();
+                expr = new Expr.Binary(expr, @operator, right);
             }
 
             return expr;
         }
 
-        private Expression Factor() {
-            Expression expr = Unary();
+        private Expr Factor() {
+            Expr expr = Unary();
 
             while (Match(TokenType.Slash, TokenType.Star))
             {
                 Token @operator = Previous();
-                Expression right = Unary();
-                expr = new Expression.Binary(expr, @operator, right);
+                Expr right = Unary();
+                expr = new Expr.Binary(expr, @operator, right);
             }
 
             return expr;
         }
 
-        private Expression Unary() {
+        private Expr Unary() {
             if (Match(TokenType.Bang, TokenType.Minus))
             {
                 Token @operator = Previous();
-                Expression right = Unary();
-                return new Expression.Unary(@operator, right);
+                Expr right = Unary();
+                return new Expr.Unary(@operator, right);
             }
 
             return Primary();
         }
 
-        private Expression Primary() {
-            if(Match(TokenType.False)) return new Expression.Literal(false);
-            if(Match(TokenType.True)) return new Expression.Literal(true);
-            if(Match(TokenType.Nil)) return new Expression.Literal(null);
+        private Expr Primary() {
+            if(Match(TokenType.False)) return new Expr.Literal(false);
+            if(Match(TokenType.True)) return new Expr.Literal(true);
+            if(Match(TokenType.Nil)) return new Expr.Literal(null);
 
             if(Match(TokenType.Number, TokenType.String))
             {
-                return new Expression.Literal(Previous().Literal);
+                return new Expr.Literal(Previous().Literal);
             }
 
             if (Match(TokenType.LeftParen))
             {
-                Expression expression = Expression();
+                Expr expression = Expression();
                 Consume(TokenType.RightParen, "Expect ')' after expression.");
-                return new Expression.Grouping(expression);
+                return new Expr.Grouping(expression);
             }
 
             throw Error(Peek(), "Expect expression.");

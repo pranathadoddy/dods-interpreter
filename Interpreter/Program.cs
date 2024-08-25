@@ -6,7 +6,7 @@ namespace Interpreter
     {
         private static bool hadError = false;
         private static bool hadRuntimeError = false;
-        private static readonly Interpret Interpreter = new Interpret();
+        private static readonly Interpret _interpreter = new Interpret();
 
         static void Main(string[] args)
         {
@@ -52,12 +52,11 @@ namespace Interpreter
             //}
 
             var parser = new Parser(tokens);
-            var expression = parser.Parse();
+            var statements = parser.Parse();
 
             if (hadError) return;
 
-            var astPrinter = new AstPrinter();
-            Console.WriteLine(astPrinter.Print(expression));
+            _interpreter.Parse(statements);
         }
 
         public static void Error(int line, string message) { 
@@ -68,22 +67,22 @@ namespace Interpreter
         {
             if (token.Type == TokenType.Eof)
             {
-                Report(token.Line, " at end", message);
+                Report(token.Line, " pada akhir", message);
             }
             else
             {
-                Report(token.Line, $" at '{token.Lexeme}'", message);
+                Report(token.Line, $" pada '{token.Lexeme}'", message);
             }
         }
 
         private static void Report(int line, string where, string message) { 
-            Console.WriteLine($"[line {line}] Error {where} : {message}");
+            Console.WriteLine($"[Baris {line}] Error {where} : {message}");
             hadError = true;
         }
 
-        private static void RuntimeError(RuntimeError error) {
+        public static void RuntimeError(RuntimeError error) {
             Console.Error.WriteLine(error.Message +
-        $"\n[line {error.Token.Line}]");
+        $"\n[Baris {error.Token.Line}]");
             hadRuntimeError = true;
         }
     }
