@@ -5,6 +5,8 @@ namespace Interpreter
     internal class Program
     {
         private static bool hadError = false;
+        private static bool hadRuntimeError = false;
+        private static readonly Interpret Interpreter = new Interpret();
 
         static void Main(string[] args)
         {
@@ -17,6 +19,10 @@ namespace Interpreter
             string content = Encoding.Default.GetString(bytes);
 
             Run(content);
+
+            if (hadError) Environment.Exit(65);
+
+            if (hadRuntimeError) Environment.Exit(70);
         }
 
         private static void RunPrompt()
@@ -73,6 +79,12 @@ namespace Interpreter
         private static void Report(int line, string where, string message) { 
             Console.WriteLine($"[line {line}] Error {where} : {message}");
             hadError = true;
+        }
+
+        private static void RuntimeError(RuntimeError error) {
+            Console.Error.WriteLine(error.Message +
+        $"\n[line {error.Token.Line}]");
+            hadRuntimeError = true;
         }
     }
 }
