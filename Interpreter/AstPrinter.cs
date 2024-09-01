@@ -38,6 +38,11 @@ namespace Interpreter
             return expr.Value.ToString(); 
         }
 
+        string Expr.IVisitor<string>.VisitVariableExpr(Interpreter.Expr.Variable expr)
+        {
+            return "";
+        }
+
         string Expr.IVisitor<string>.VisitGroupingExpr(Interpreter.Expr.Grouping expr)
         {
             return Parenthesize("group", expr.Expression);

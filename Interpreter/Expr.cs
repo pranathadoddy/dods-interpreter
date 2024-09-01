@@ -9,6 +9,8 @@
             R VisitGroupingExpr(Grouping expr);
             R VisitUnaryExpr(Unary expr);
 
+            R VisitVariableExpr(Variable expr);
+
         }
 
         internal abstract R Accept<R>(IVisitor<R> visitor);
@@ -77,6 +79,21 @@
 
             public readonly Token Operator;
             public readonly Expr Right;
+        }
+
+        public class Variable : Expr
+        {
+            public Variable(Token token)
+            {
+                this.Token = token;
+            }
+
+            public readonly Token Token;
+
+            internal override R Accept<R>(IVisitor<R> visitor)
+            {
+                return visitor.VisitVariableExpr(this);
+            }
         }
     }
 

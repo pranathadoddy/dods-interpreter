@@ -22,12 +22,26 @@
                 var statements = new List<Stmt>();
 
                 while (!IsAtEnd()) {
-                    statements.Add(Statement());
+                    statements.Add(Declaration());
                 }
 
                 return statements;
             }
             catch (ParseError error)
+            {
+                Synchronize();
+                return null;
+            }
+        }
+
+        private Stmt Declaration() {
+            try
+            {
+                if (Match(TokenType.Var)) return VarDeclaration();
+
+                return Statement();
+            }
+            catch (Exception exception)
             {
                 Synchronize();
                 return null;
@@ -131,6 +145,11 @@
                 return new Expr.Literal(Previous().Literal);
             }
 
+            if (Match(TokenType.Identifier))
+            {
+                return new Expr.Variable(Previous());
+            }
+
             if (Match(TokenType.LeftParen))
             {
                 Expr expression = Expression();
@@ -213,6 +232,20 @@
 
                 Advance();
             }
+        }
+
+        private Stmt VarDeclaration()
+        {
+            var name = Consume(TokenType.Identifier, "Expect variable name.");
+
+            Expr initializer = null;
+            if (Match(TokenType.Equal))
+            {
+                initializer = Expression();
+            }
+
+            Consume(TokenType.Semicolon, "Expect ';' after variable name");
+            return new Stmt.Var(name, initializer);
         }
     }
 }
