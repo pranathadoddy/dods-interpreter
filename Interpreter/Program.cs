@@ -10,6 +10,24 @@ namespace Interpreter
 
         static void Main(string[] args)
         {
+            if (args.Length > 2)
+            {
+                Console.WriteLine("Usage: dod <filename>");
+                return;
+            }
+
+            if(args.Length == 2)
+            {
+                string command = args[0];
+                string path = args[1];
+
+                if (command.ToLower() == "dod")
+                {
+                    RunFile(path);
+                    return;
+                }
+            }
+
             RunPrompt();
         }
 
@@ -54,6 +72,7 @@ namespace Interpreter
             var parser = new Parser(tokens);
             var statements = parser.Parse();
 
+            
             if (hadError) return;
 
             _interpreter.Parse(statements);
