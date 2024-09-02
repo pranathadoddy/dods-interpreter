@@ -8,6 +8,8 @@ namespace Interpreter
         {
             R VisitExpressionStatement(Expression stmt);
             R VisitPrintStatement(Print stmt);
+
+            R VisitVarStatement(Var var);
         }
 
         internal abstract R Accept<R>(IVisitor<R> visitor);
@@ -38,6 +40,23 @@ namespace Interpreter
             internal override R Accept<R>(IVisitor<R> visitor)
             {
                 return visitor.VisitPrintStatement(this);
+            }
+        }
+
+        public class Var : Stmt
+        {
+            public Var(Token name, Expr expr)
+            {
+                this.Expr = expr;
+                this.Name = name;
+            }
+
+            public Expr Expr;
+            public Token Name;
+
+            internal override R Accept<R>(IVisitor<R> visitor)
+            {
+                return visitor.VisitVarStatement(this);
             }
         }
     }

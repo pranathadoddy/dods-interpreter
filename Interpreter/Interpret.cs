@@ -2,6 +2,7 @@
 {
     internal class Interpret : Expr.IVisitor<object>, Stmt.IVisitor<object>
     {
+        DataStore environment = new DataStore();
 
         public void Parse(List<Stmt> statements)
         {
@@ -95,6 +96,23 @@
                     return !IsEqual(left, right);
             }
 
+            return null;
+        }
+
+        object Expr.IVisitor<object>.VisitVariableExpr(Interpreter.Expr.Variable expr)
+        {
+            return environment.GetValue(expr.Token);
+        }
+
+        object Stmt.IVisitor<object>.VisitVarStatement(Interpreter.Stmt.Var stmt)
+        {
+            object value = null;
+            if(stmt.Expr != null)
+            {
+                value = Evaluate(stmt.Expr);
+            }
+
+            environment.Define(stmt.Name.Lexeme, value);
             return null;
         }
 

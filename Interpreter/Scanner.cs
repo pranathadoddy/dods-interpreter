@@ -29,7 +29,7 @@
                 { "super", TokenType.Super },
                 { "this", TokenType.This },
                 { "true", TokenType.True },
-                { "var", TokenType.Var },
+                { "simpan", TokenType.Var },
                 { "while", TokenType.While }
             };
         }
